@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
+from db import get_connection
 
 app = FastAPI()
 
@@ -6,6 +8,27 @@ app = FastAPI()
 @app.get("/ping")
 def ping():
     return {"message": "pong"}
+
+class Film(BaseModel):
+    id: int | None = None
+    nom: str
+    note: float | None = None
+    dateSortie: int
+    image: str | None = None
+    video: str | None = None
+    genreId: int | None = None
+
+@app.post("/film")
+async def createFilm(film : Film):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(f"""
+            INSERT INTO Film (Nom,Note,DateSortie,Image,Video)  
+            VALUES('{film.nom}',{film.note},{film.dateSortie},'{film.image}','{film.video}') RETURNING *
+            """)
+        res = cursor.fetchone()
+        print(res)
+        return res
 
 
 if __name__ == "__main__":

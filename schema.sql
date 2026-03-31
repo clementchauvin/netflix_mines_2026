@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS Film (
     DateSortie   INTEGER,           -- année (ex: 2023)
     Image        TEXT,              -- URL
     Video        TEXT,              -- URL
-    Genre_ID     INTEGER NOT NULL,
+    Genre_ID     INTEGER,
     FOREIGN KEY (Genre_ID) REFERENCES Genre(ID)
         ON UPDATE CASCADE ON DELETE RESTRICT
 );
