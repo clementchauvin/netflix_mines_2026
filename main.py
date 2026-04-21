@@ -143,18 +143,17 @@ class PreferenceIn(BaseModel):
 
 
 
-
 @app.post("/auth/register")
 def register(user: UserAuth):
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(f"SELECT ID FROM User WHERE Email = '{user.email}'")
+        cursor.execute(f"SELECT ID FROM Utilisateur WHERE AdresseMail = '{user.email}'")
         if cursor.fetchone():
             raise HTTPException(status_code=409, detail="email dejaa utilisé")
             
         
         cursor.execute(f"""
-            INSERT INTO User (Email, Pseudo, Password) 
+            INSERT INTO Utilisateur (AdresseMail, Pseudo, MotDePasse) 
             VALUES ('{user.email}', '{user.pseudo}', '{user.password}') 
             RETURNING ID
         """)
@@ -167,7 +166,7 @@ def register(user: UserAuth):
 def login(user: UserAuth):
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute(f"SELECT ID FROM User WHERE Email = '{user.email}' AND Password = '{user.password}'")
+        cursor.execute(f"SELECT ID FROM Utilisateur WHERE AdresseMail = '{user.email}' AND MotDePasse = '{user.password}'")
         database_user = cursor.fetchone()
         
         if not database_user:
@@ -175,7 +174,6 @@ def login(user: UserAuth):
             
         access_token = create_access_token(data={"user_id": database_user["ID"]})
         return {"access_token": access_token, "token_type": "bearer"}
-
 
 
 if __name__ == "__main__":
